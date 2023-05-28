@@ -1,6 +1,15 @@
-import { Card, CardContent ,Divider , Typography , Button ,Grid , Box } from "@mui/material";
+import {
+  Card,
+  CardContent,
+  Divider,
+  Typography,
+  Button,
+  Grid,
+  Box,
+} from "@mui/material";
 import PlaceIcon from "@mui/icons-material/Place";
 import MapComponent from "./Map.jsx";
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 export default function LocationCard({
   name,
@@ -9,12 +18,16 @@ export default function LocationCard({
   price,
   coordinates,
 }) {
+
+  const isMobile = useMediaQuery('(max-width:767px)');
+  console.log("isMobile", isMobile)
   return (
     <Card
       style={{
-        width: "90%",
-        marginTop: "80px",
-        backgroundColor: "rgb(82 213 255 / 66%)",
+        width: (isMobile) ? "300px": "1100px",
+        marginTop: "50px",
+        backgroundColor: " rgb(119 207 237 / 66%)",
+        border: "1px solid black",
       }}
     >
       {/* <CardMedia component="img" height="210" image = {punjabimage}/> */}
@@ -41,7 +54,8 @@ export default function LocationCard({
               color="text.secondary"
               fontWeight="bolder"
             >
-              <b>$ </b>{price}
+              <b>$ </b>
+              {price}
             </Typography>
           </Grid>
           <Grid item>

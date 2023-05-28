@@ -1,56 +1,59 @@
-import Card from "@mui/material/Card";
-import CardHeader from "@mui/material/CardHeader";
-import CardMedia from "@mui/material/CardMedia";
-import CardContent from "@mui/material/CardContent";
-import CardActions from "@mui/material/CardActions";
 import Avatar from "@mui/material/Avatar";
-import IconButton from "@mui/material/IconButton";
-import Typography from "@mui/material/Typography";
-import { red } from "@mui/material/colors";
-import ShareIcon from "@mui/icons-material/Share";
 import { Box, Button } from "@mui/material";
-import Checkbox from "@mui/material/Checkbox";
-import ThumbUpOutlinedIcon from "@mui/icons-material/ThumbUpOutlined";
-import ThumbUpIcon from "@mui/icons-material/ThumbUp";
-import ThumbDownAltOutlinedIcon from "@mui/icons-material/ThumbDownAltOutlined";
-import ThumbDownAltIcon from "@mui/icons-material/ThumbDownAlt";
-import DoneIcon from "@mui/icons-material/Done";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import EmailIcon from "@mui/icons-material/Email";
 import SyncIcon from "@mui/icons-material/Sync";
 import { useState } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
+import Posts from "./Posts";
+import profileBackImage from "../../images/profilebackimage.jpg";
+import Lottie from "lottie-react";
+import circularLoading from "../../assets/circularLoading.json";
 
-const FeedContent = ({ loggedInuserData }) => {
-  const [postData, setpostData] = useState([]);
-  const [activateFollowButton, setactivateFollowButton] = useState(false);
-  const [Isfollowing, setIsfollowing] = useState(false);
-  const {searchedUserData} = useSelector((store)=>store.user);
-  // const [RequiredUserID, setRequiredUserID] = useState(loggedInUserData.id);
+const FeedContent = () => {
+  const [profileData, setProfileData] = useState([]);
+  const [showProfile, setShowProfile] = useState(false);
+  const [IsFollowing, setIsFollowing] = useState(false);
+  const { searchedUserData } = useSelector((store) => store.user);
+  const { loggedInuserData } = useSelector((store) => store.user);
+  const [hoverText, setHoverText] = useState("Following");
+  const [isFetching, setIsFetching] = useState(false);
 
-  console.log("feeduser", searchedUserData);
-  const loadPost = async () => {
+  const month = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
+  console.log("searcheduser", searchedUserData);
+  console.log("loggedinuserdatainfeedcontent", loggedInuserData);
+
+  const loadUserProfileData = async () => {
     try {
       const response = await axios.get(
         process.env.REACT_APP_SERVER_URL +
-          `/api/posts?where[userId][equals]=${
-            searchedUserData ? searchedUserData.id : loggedInuserData.id
-          }`,
+          `/api/users/profile/${searchedUserData.id}`,
         { withCredentials: true }
       );
-      console.log("response", response);
-      setpostData(response.data.docs);
-      if (searchedUserData.length !== 0) {
-        setactivateFollowButton(true);
-      }
-      // setactivateFollowButton(true);
+      console.log("profileData", response);
+      setProfileData(response.data);
+      setShowProfile(true);
+      setIsFollowing(response.data.profile.isFollowed);
     } catch (error) {
       console.log(error);
     }
   };
-
-  console.log("postData", postData);
-
-  const followUser = async () => {
+  const handleFollow = async () => {
     try {
       const response = await axios.post(
         process.env.REACT_APP_SERVER_URL + `/api/follows`,
@@ -58,15 +61,13 @@ const FeedContent = ({ loggedInuserData }) => {
         { withCredentials: true }
       );
       console.log(response);
-      setIsfollowing(true);
+      setIsFollowing(true);
     } catch (error) {
       console.log(error);
     }
-    console.log("followed");
   };
 
-  const unfollowUser = async () => {
-    console.log("unfollowed");
+  const handleUnFollow = async () => {
     try {
       const response = await axios.post(
         process.env.REACT_APP_SERVER_URL + `/api/follows/unfollow`,
@@ -74,27 +75,11 @@ const FeedContent = ({ loggedInuserData }) => {
         { withCredentials: true }
       );
       console.log(response);
-      setIsfollowing(false);
+      setIsFollowing(false);
     } catch (error) {
       console.log(error);
     }
   };
-
-  const [likeChecked, setLikeChecked] = useState(() => {
-    const initialMap = new Map();
-    postData.forEach((data) => {
-      initialMap.set(data.userId.id, false);
-    });
-    return initialMap;
-  });
-
-  const [unlikeChecked, setUnlikeChecked] = useState(() => {
-    const initialMap = new Map();
-    postData.forEach((data) => {
-      initialMap.set(data.userId.id, false);
-    });
-    return initialMap;
-  });
 
   const handleLikeChange = async (e) => {
     try {
@@ -104,139 +89,246 @@ const FeedContent = ({ loggedInuserData }) => {
         { withCredentials: true }
       );
       console.log(response);
+      setProfileData((prevData) => {
+        const updatedPosts = prevData.profile.posts.map((post) => {
+          if (post._id === e.target.value) {
+            return { ...post, liked: true, totalLikes: post.totalLikes + 1 };
+          }
+          return post;
+        });
+        return {
+          ...prevData,
+          profile: { ...prevData.profile, posts: updatedPosts },
+        };
+      });
     } catch (error) {
       console.log(error);
     }
-    setLikeChecked((prevState) => ({
-      ...prevState,
-      [e.target.value]: true,
-    }));
-    setUnlikeChecked((prevState) => ({
-      ...prevState,
-      [e.target.value]: false,
-    }));
-    console.log("like post id", e.target.value);
-    console.log("liked");
   };
+
   const handleUnlikeChange = async (e) => {
     try {
       const response = await axios.post(
-        process.env.REACT_APP_SERVER_URL + `/api/unlike`,
+        process.env.REACT_APP_SERVER_URL + `/api/likes/unlike`,
         { postId: `${e.target.value}` },
         { withCredentials: true }
       );
       console.log(response);
+      setProfileData((prevData) => {
+        const updatedPosts = prevData.profile.posts.map((post) => {
+          if (post._id === e.target.value) {
+            return { ...post, liked: false, totalLikes: post.totalLikes - 1 };
+          }
+          return post;
+        });
+        return {
+          ...prevData,
+          profile: { ...prevData.profile, posts: updatedPosts },
+        };
+      });
     } catch (error) {
       console.log(error);
     }
-    setLikeChecked((prevState) => ({
-      ...prevState,
-      [e.target.value]: false,
-    }));
-    setUnlikeChecked((prevState) => ({
-      ...prevState,
-      [e.target.value]: true,
-    }));
-    console.log("unliked");
   };
 
+  console.log("profileData", profileData);
+
   return (
-    <Box flex={3}  display = "flex" alignItems="center" justifyContent = "center">
+    <Box flex={3} display="flex" alignItems="center" justifyContent="center">
       <Box
         display="flex"
         alignItems="center"
         justifyContent="center"
         flexDirection="column"
         mt="50px"
-        // mr="20px"
         maxWidth="900px"
-        // border="2px solid black"
       >
         <Box>
-          <Button onClick={loadPost} cursor="pointer">
+          <Button
+            onClick={() => {
+              setIsFetching(true);
+              setShowProfile(false);
+              if (searchedUserData.length === 0) {
+                // console.log("loading all post");
+                // loadAllPost();
+              } else {
+                console.log("loading searched user post");
+                loadUserProfileData();
+              }
+            }}
+            cursor="pointer"
+          >
             <SyncIcon fontSize="large" />
           </Button>
-          {activateFollowButton &&
-            (Isfollowing ? (
-              <Button
-                variant="contained"
-                sx={{ marginLeft: "200px" }}
-                onClick={unfollowUser}
-              >
-                <div style={{ display: "flex" }}>
-                  <DoneIcon />
-                  Following
-                </div>
-              </Button>
-            ) : (
-              <Button
-                variant="contained"
-                sx={{ marginLeft: "200px" }}
-                onClick={followUser}
-              >
-                Follow {searchedUserData.username}
-              </Button>
-            ))}
-
-          {/* <Button
-              variant="contained"
-              sx={{ marginLeft: "200px" }}
-              onClick={followUser}
-            >
-              {Isfollowing
-                ? <div style = {{display: "flex"}}><DoneIcon/>Following </div>
-                : `Follow ${searchedUserData.username}`}
-            </Button> */}
         </Box>
-        {postData.map((data, index) => {
-          return (
-            <Card
-              key={index}
-              sx={{ width: "100%", height: "auto", marginBottom: "20px" }}
+
+        {showProfile ? (
+          <Box
+            border="4px solid #49b8e3"
+            height="100%"
+            width={{ xs: "350px", sm: "850px" }}
+            borderRadius="10px"
+            p={2}
+            display="flex"
+            flexDirection="column"
+            justifyContent="center"
+            alignItems="center"
+          >
+            <Box
+              // border="2px solid black"
+              height="400px"
+              width="100%"
+              borderRadius="10px"
             >
-              <CardHeader
-                avatar={
-                  <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
-                    {data.userId.username[0]}
-                  </Avatar>
-                }
-                title={data.userId.username}
-                subheader={data.userId.updatedAt.substring(0, 10)}
+              <div
+                style={{
+                  borderTopLeftRadius: "10px",
+                  borderTopRightRadius: "10px",
+                  height: "50%",
+                  backgroundImage: `url(${profileBackImage})`,
+                  backgroundRepeat: "no-repeat",
+                  backgroundSize: "cover",
+                }}
               />
-              <CardMedia
-                component="img"
-                height="20%"
-                width="70%"
-                image={data.url}
-                alt="Paella dish"
+              <Avatar
+                sx={{
+                  bgcolor: "orange",
+                  height: "90px",
+                  width: "90px",
+                  marginLeft: "20px",
+                  position: "relative",
+                  bottom: "15%",
+                }}
+              >
+                <h1>{profileData.profile.username[0].toUpperCase()}</h1>
+              </Avatar>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  bottom: "300px",
+                }}
+              >
+                <div>
+                  <h2
+                    style={{
+                      margin: "0px",
+                      color: "#437fb0",
+                      marginBottom: "20px",
+                    }}
+                  >
+                    {profileData.profile.username}
+                  </h2>
+                  <div
+                    style={{
+                      margin: "0",
+                      color: "#437fb0",
+                      display: "flex",
+                      alignItems: "center",
+                      marginBottom: "5px",
+                      width: "250px",
+                    }}
+                  >
+                    <CalendarMonthIcon sx={{ height: "20px" }} />
+                    <h4
+                      style={{
+                        margin: "0",
+                        marginLeft: "5px",
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      Joined{" "}
+                      {
+                        month[
+                          parseInt(
+                            profileData.profile.createdAt.substring(6, 7)
+                          ) - 1
+                        ]
+                      }{" "}
+                      {profileData.profile.createdAt.substring(0, 4)}
+                    </h4>
+                  </div>
+                  <div
+                    style={{
+                      margin: "0",
+                      color: "#437fb0",
+                      display: "flex",
+                      alignItems: "center",
+                      marginBottom: "5px",
+                      width: "250px",
+                    }}
+                  >
+                    <EmailIcon sx={{ height: "20px" }} />
+                    <h4
+                      style={{
+                        margin: "0",
+                        marginLeft: "5px",
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      {profileData.profile.email}
+                    </h4>
+                  </div>
+                </div>
+                <div style={{ marginRight: "20px" }}>
+                  {searchedUserData.id !== loggedInuserData.id ? (
+                    IsFollowing ? (
+                      <Button
+                        variant="outlined"
+                        sx={{ borderRadius: "20px" }}
+                        onMouseEnter={() => setHoverText("Unfollow")}
+                        onMouseLeave={() => setHoverText("Following")}
+                        color={hoverText === "Unfollow" ? "error" : undefined}
+                        // color = "error"
+                        onClick={handleUnFollow}
+                      >
+                        <span style={{ fontWeight: "bold" }}>{hoverText}</span>
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="outlined"
+                        sx={{ borderRadius: "20px" }}
+                        onClick={handleFollow}
+                      >
+                        <span style={{ fontWeight: "bold" }}>Follow</span>
+                      </Button>
+                    )
+                  ) : null}
+                </div>
+              </div>
+            </Box>
+          </Box>
+        ) : isFetching ? (
+          <div
+            style={{
+              marginTop: "190px",
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            <Lottie
+              animationData={circularLoading}
+              style={{ height: "100px" }}
+            />
+          </div>
+        ) : null}
+        <div style={{ marginTop: "35px" }}>
+          {showProfile &&
+            profileData.profile.posts.map((data, index) => (
+              <Posts
+                data={data}
+                index={index}
+                handleLikeChange={handleLikeChange}
+                handleUnlikeChange={handleUnlikeChange}
               />
-              <CardContent>
-                <Typography variant="body2" color="text.secondary">
-                  {data.caption}
-                </Typography>
-              </CardContent>
-              <CardActions disableSpacing>
-                <Checkbox
-                  icon={<ThumbUpOutlinedIcon />}
-                  checkedIcon={<ThumbUpIcon sx={{ color: "red" }} />}
-                  checked={likeChecked[data.userId.id]}
-                  onClick={handleLikeChange}
-                  value={data.userId.id}
-                />
-                <Checkbox
-                  icon={<ThumbDownAltOutlinedIcon />}
-                  checkedIcon={<ThumbDownAltIcon sx={{ color: "red" }} />}
-                  checked={unlikeChecked[data.userId.id]}
-                  onClick={handleUnlikeChange}
-                  value={data.userId.id}
-                />
-                <IconButton aria-label="share">
-                  <ShareIcon />
-                </IconButton>
-              </CardActions>
-            </Card>
-          );
-        })}
+            ))}
+        </div>
       </Box>
     </Box>
   );

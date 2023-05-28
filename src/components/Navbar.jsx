@@ -1,5 +1,6 @@
 import {
   AppBar,
+  Box,
   Button,
   IconButton,
   Menu,
@@ -15,16 +16,22 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import LoginIcon from "@mui/icons-material/Login";
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
 import SearchIcon from "@mui/icons-material/Search";
+import MenuIcon from "@mui/icons-material/Menu";
+import HomeIcon from "@mui/icons-material/Home";
 import axios from "axios";
 import Autocomplete from "@mui/material/Autocomplete";
 import { useLogoutMutation } from "../store";
 import { useDispatch, useSelector } from "react-redux";
-import { setrdkAuthenticated, setrdkloggedInUserData, setrdksearchUserData } from "../store/user/userSlice";
+import {
+  setrdkAuthenticated,
+  setrdkloggedInUserData,
+  setrdksearchUserData,
+} from "../store/user/userSlice";
 
 const Navbar = () => {
   const [anchorE1, setAnchorE1] = useState(null);
-  const [logout, {isLoading}] = useLogoutMutation();
-  const {isAuthenticated} = useSelector((store)=>store.user);
+  const [logout, { isLoading }] = useLogoutMutation();
+  const { isAuthenticated } = useSelector((store) => store.user);
   const dispatch = useDispatch();
 
   const handleMenu = (event) => {
@@ -37,7 +44,7 @@ const Navbar = () => {
 
   const [searchTerm, setsearchTerm] = useState("");
   const [options, setoptions] = useState([]);
-  console.log(searchTerm);
+  // console.log(searchTerm);
 
   const handleSearchClick = async () => {
     try {
@@ -66,7 +73,7 @@ const Navbar = () => {
       logout();
       dispatch(setrdkAuthenticated(false));
       dispatch(setrdkloggedInUserData([]));
-      localStorage.removeItem("remeberUser");
+      localStorage.removeItem("rememberUser");
       alert("Logout successfully");
     } catch (error) {
       console.error(error);
@@ -129,11 +136,14 @@ const Navbar = () => {
                     getOptionLabel={(option) => option.username}
                     onChange={handleOnChange}
                     renderInput={(params) => (
-                      <div
-                        style={{
+                      <Box
+                        sx={{
                           display: "flex",
                           flexDirection: "row",
-                          width: "300px",
+                          width: "200px",
+                          "@media (min-width: 768px)": {
+                            width: "300px",
+                          },
                         }}
                       >
                         {" "}
@@ -154,7 +164,7 @@ const Navbar = () => {
                         <Button variant="outlined" onClick={handleSearchClick}>
                           <SearchIcon />
                         </Button>
-                      </div>
+                      </Box>
                     )}
                   />
                 </>

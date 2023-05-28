@@ -26,10 +26,11 @@ const Social = ({loggedInuserData}) => {
           mt="60px"
         >
           <Box
-            sx={{ display: { xs: "none", sm: "block" } }}
+            // sx={{ display: { xs: "none", sm: "block" } }}
             flex={1}
             p={2}
-            mr="25px"
+            mr={{xs: "0px", sm: "25px"}}
+            pl = {{xs: "0px", sm: "16px"}}
             alignItems="center"
             maxWidth = "200px"
           >

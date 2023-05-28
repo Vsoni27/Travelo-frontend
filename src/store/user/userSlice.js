@@ -6,7 +6,7 @@ const userSlice = createSlice({
     isAuthenticated: false,
     loggedInuserData: [],
     searchedUserData: [],
-  },
+  }, 
   reducers: {
     setrdkAuthenticated: (state, action) => {
       state.isAuthenticated = action.payload;
@@ -14,7 +14,7 @@ const userSlice = createSlice({
     },
     setrdkloggedInUserData: (state, action) => {
       state.loggedInuserData = action.payload;
-      //   console.log("rdkuserdata", state.loggedInuserData);
+        console.log("rdkuserdata", state.loggedInuserData);
     },
     setrdksearchUserData: (state, action) => {
       state.searchedUserData = action.payload;

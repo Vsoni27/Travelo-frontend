@@ -1,4 +1,10 @@
-import { Box, Button, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  TextField,
+  Typography,
+} from "@mui/material";
 import React, { useState, useRef } from "react";
 import signup from "../images/signupbg.jpg";
 import axios from "axios";
@@ -6,10 +12,13 @@ import { Link } from "react-router-dom";
 import { Navigate } from "react-router-dom";
 import { useLoginMutation } from "../store";
 import { useDispatch } from "react-redux";
-import { setrdkAuthenticated, setrdkloggedInUserData } from "../store/user/userSlice";
+import {
+  setrdkAuthenticated,
+  setrdkloggedInUserData,
+} from "../store/user/userSlice";
 
 const Login = () => {
-  const [login, {isLoading}] = useLoginMutation();
+  const [login, { isLoading }] = useLoginMutation();
   const dispatch = useDispatch();
 
   const emailRef = useRef(null);
@@ -17,46 +26,25 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // const formData = new FormData(e.target);
-    // const data = Object.fromEntries(formData.entries());
-
-    // setLogIndata(data);
-    // console.log(logIndata);
-
-    // try {
-    //   const response = await axios.post(process.env.REACT_APP_SERVER_URL+'/api/users/login',{
-    //     email: data.email,
-    //     password: data.password
-    //   },{
-    //     withCredentials: true
-    //   });
-    //   console.log(response);
-    //   const {tokens, user} = response.data;
-    //   localStorage.setItem("loggedInUserData", JSON.stringify({ user, tokens }))
-    //   setAuthenticated(true);
-    //   setloggedInUserData({tokens, user});
-    //   <Navigate to = "/Social"/>
-    // } catch (error) {
-    //   console.log(error);
-    // }
     const email = emailRef.current.value;
     const password = passwordRef.current.value;
     try {
       const response = await login({ email, password });
       console.log(response);
-      const rememberUser = response.data;
-      localStorage.setItem("rememberUser", rememberUser);
-      const temp = localStorage.getItem("rememberUser");
-      console.log("temp", JSON.stringify(temp));
-      dispatch(setrdkAuthenticated(true));
-      dispatch(setrdkloggedInUserData(response.data.user));
-      // setAuthenticated(true);
+
+      if (response && response.data && response.data.user) {
+        const rememberUser = response.data;
+        localStorage.setItem("rememberUser", JSON.stringify(rememberUser));
+        dispatch(setrdkAuthenticated(true));
+        dispatch(setrdkloggedInUserData(response.data.user));
+      } else {
+        // Handle the case when the 'user' property is missing or response is invalid
+        throw new Error("Invalid response format");
+      }
     } catch (error) {
       console.log(error);
-      alert(error.data.errors[0].message);
       dispatch(setrdkAuthenticated(false));
     }
-    // setloggedInUserData({tokens, user});
   };
 
   return (
@@ -115,9 +103,16 @@ const Login = () => {
           variant="contained"
           color="primary"
           type="submit"
-          style={{ marginTop: 24, display: "block" }}
+          style={{ marginTop: 24, display: "flex" }}
         >
-          Submit
+          Submit{" "}
+          {isLoading ? (
+            <CircularProgress
+              size={25}
+              color="inherit"
+              style={{ marginLeft: "15px" }}
+            />
+          ) : null}
         </Button>
         <Typography mt="25px">
           <Link to="/signup">Don't have an account?</Link>

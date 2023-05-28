@@ -7,51 +7,33 @@ import {
 } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import AuthLoader from "./components/AuthLoader";
-import { Signup, Login, Form, Error404, Profile, Social } from "./pages";
+import { Signup, Login, Form, Error404, Profile, Social, TravelSuggestion } from "./pages";
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setrdkAuthenticated, setrdkloggedInUserData } from "./store/user/userSlice";
 
 function App() {
-  // const [authenticated, setAuthenticated] = useState(false);
-  // const [loggedInUserData, setloggedInUserData] = useState(() => {
-  //   const userData = localStorage.getItem("loggedInUserData");
-  //   return userData ? JSON.parse(userData) : { user: null, tokens: null };
-  // });
-  // const [searchedUserData, setsearchedUserData] = useState([]);
-  // if (isFetching || isError) return <AuthLoader />
-  // console.log("authenticated",authenticated);
-  // console.log("userData", loggedInUserData);
-  // console.log("searchedUserData", searchedUserData);
 
   const {isAuthenticated, loggedInuserData} = useSelector((store)=>store.user);
   const dispatch = useDispatch();
 
-  // useEffect(() => {
-  //   const userDataFromLocalStorage = localStorage.getItem("loggedInUserData");
-  //   if (userDataFromLocalStorage) {
-  //     const { user, tokens } = JSON.parse(userDataFromLocalStorage);
-  //     setAuthenticated(true);
-  //     setloggedInUserData({ user, tokens });
-  //   }
-  // }, []);
-
   useEffect(()=>{
     const userDataFromLocalStorage = localStorage.getItem("rememberUser");
-    if(userDataFromLocalStorage.length!==0){
-      const [user] = userDataFromLocalStorage;
-      console.log(userDataFromLocalStorage);
+    if(userDataFromLocalStorage){
+      // console.log(JSON.parse(userDataFromLocalStorage))
+      const localData = JSON.parse(userDataFromLocalStorage);
+      console.log("userDataFromLocalStorage",JSON.parse(userDataFromLocalStorage));
       dispatch(setrdkAuthenticated(true));
-      dispatch(setrdkloggedInUserData(user));
-      console.log("localuser",user);
-      console.log("loggedinuser", loggedInuserData);
+      dispatch(setrdkloggedInUserData(localData.user));
+      console.log("loggedInUserinLocal",localData.user);
+      // console.log("loggedinuser", loggedInuserData);
     }else{
       dispatch(setrdkAuthenticated(false));
     }
   },[])
 
   return (
-    <div className="App">
+    <div className="App" style = {{height: "100vh"}}>
       <BrowserRouter>
         <Routes>
           <Route
@@ -75,10 +57,6 @@ function App() {
             ) : (
               <Route index element={<Form />} />
             )}
-            {/* <Route
-                path="/Social"
-                element={<Social loggedInUserData={loggedInUserData} searchedUserData = {searchedUserData}/>}
-              /> */}
             <Route
               path="/login"
               element={
@@ -86,7 +64,8 @@ function App() {
                 />
               }
             />
-            {/*           <Route path="*" element={<NoPage />} /> */}
+            <Route path = "/Profile" element = {<Profile />}/>
+            <Route path = "/TravelSuggestion" element = {<TravelSuggestion />}/>
           </Route>
         </Routes>
       </BrowserRouter>

@@ -16,6 +16,7 @@ import {
   Input,
 } from "@mui/material";
 import axios from "axios";
+import { useSelector } from "react-redux";
 
 const StyledModal = styled(Modal)({
   display: "flex",
@@ -34,18 +35,19 @@ const AddPost = () => {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+  const { loggedInuserData } = useSelector((store) => store.user);
+  console.log("here", loggedInuserData);
 
   const [caption, setcaption] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
 
-  const handleCaptionChange = (event)=>{
+  const handleCaptionChange = (event) => {
     setcaption(event.target.value);
-  }
+  };
 
-  const onFileChange = (event)=>{
+  const onFileChange = (event) => {
     setSelectedFile(event.target.files[0]);
-  }
-
+  };
 
   const handlePost = async (e) => {
     e.preventDefault();
@@ -100,12 +102,11 @@ const AddPost = () => {
             Create post
           </Typography>
           <UserBox>
-            <Avatar
-              src="../../Images/profile.png"
-              sx={{ width: 30, height: 30 }}
-            />
+            <Avatar sx={{ bgcolor: "red" }} aria-label="recipe">
+              {loggedInuserData.username[0]}
+            </Avatar>
             <Typography fontWeight={500} variant="span">
-              Vivek Soni
+              {loggedInuserData.username}
             </Typography>
           </UserBox>
           <TextField
