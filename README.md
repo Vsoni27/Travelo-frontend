@@ -19,7 +19,7 @@ https://youtu.be/EY-cDxiKwuY
 ## Tech Stack
 **Client:** ReactJS, Material-UI, Redux-toolkit
 
-**Server:** Node, Express, OpenAI, Map Box
+**Server:** Node, Express, PayloadCMS, MongoDB, TypeScript
 
 
 ## Authors
