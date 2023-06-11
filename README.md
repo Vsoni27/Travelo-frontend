@@ -1,30 +1,13 @@
-# AI Trip Planner
+# Crypto Verse
 
-Introducing our innovative travel platform that leverages AI and user-generated content! Simply input your preferences, and our OpenAI-powered recommendation engine will suggest personalized travel destinations. Engage with the vibrant social community by liking and sharing posts, unlocking tailored travel suggestions based on your preferences and interests.
+This was a tutorial based proj which I built through JavaScript Mastery. But I used MUI and tailwindCSS for the UI layout while the tutor used antd. Also I intergrated auth0 authentication feature.
 
+For data the app uses Rapid API coin ranking API: https://rapidapi.com/Coinranking/api/coinranking1
 
-## Demo
+and for the news Bing News Search API: https://rapidapi.com/microsoft-azure-org-microsoft-cognitive-services/api/bing-news-search1/
 
-https://youtu.be/EY-cDxiKwuY
-## Usage
-
-- Visit the website: [https://ai-trip-planner-coral.vercel.app/](https://ai-trip-planner-coral.vercel.app/)
-- Sign up for an account or log in if you already have one.
-- Customize your travel preferences in the Form.
-- Explore travel recommendations and like posts to personalize your suggestions.
-- Connect with other travelers and share your own travel experiences.
+Deployed Link-> https://vivondcryptoverse.netlify.app/
 
 
 
-## Tech Stack
-**Client:** ReactJS, Material-UI, Redux-toolkit
-
-**Server:** Node, Express, PayloadCMS, MongoDB, TypeScript
-
-
-## Authors
-
-- [@DireWolf707](https://github.com/DireWolf707)
-- [@reigns29](https://github.com/reigns29)
-- [@Vsoni27](https://github.com/Vsoni27)
 
